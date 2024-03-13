@@ -3,6 +3,7 @@ import 'package:blog_app/features/auth/presentation/validators/auth_validators.d
 import 'package:blog_app/features/auth/presentation/widgets/auth_field.dart';
 import 'package:blog_app/features/auth/presentation/widgets/auth_gradient_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/theme/app_pallete.dart';
 
@@ -28,39 +29,42 @@ class _SignInPageState extends State<SignInPage> {
 
   @override
   Widget build(BuildContext context) {
+    print("Height: ${MediaQuery.of(context).size.height}");
+    print("Width: ${MediaQuery.of(context).size.width}");
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
           height: MediaQuery.of(context).size.height,
-          padding: const EdgeInsets.all(15.0),
+          padding: EdgeInsets.all(15.0.w),
           child: Form(
             key: formKey,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
+                Text(
                   'Sign In',
-                  style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold),
+                  style:
+                      TextStyle(fontSize: 50.sp, fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(
-                  height: 30,
+                SizedBox(
+                  height: 30.h,
                 ),
                 AuthField(
                   hintText: "Email",
                   validator: AuthValidators.emailValidator,
                   controller: emailController,
                 ),
-                const SizedBox(
-                  height: 15,
+                SizedBox(
+                  height: 15.h,
                 ),
                 AuthField(
                   validator: AuthValidators.passwordValidator,
                   hintText: "Password",
                   controller: passwordController,
-                  isObscureText: true,
+                  isPassword: true,
                 ),
-                const SizedBox(
-                  height: 20,
+                SizedBox(
+                  height: 20.h,
                 ),
                 AuthGradientButton(
                   buttonText: "Sign In",
@@ -70,8 +74,8 @@ class _SignInPageState extends State<SignInPage> {
                     }
                   },
                 ),
-                const SizedBox(
-                  height: 20,
+                SizedBox(
+                  height: 20.h,
                 ),
                 GestureDetector(
                   onTap: () {
