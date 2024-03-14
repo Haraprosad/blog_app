@@ -1,8 +1,12 @@
+import 'package:blog_app/core/common/widgets/loader.dart';
+import 'package:blog_app/core/utils/show_snackbar.dart';
+import 'package:blog_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:blog_app/features/auth/presentation/pages/signup_page.dart';
 import 'package:blog_app/features/auth/presentation/validators/auth_validators.dart';
 import 'package:blog_app/features/auth/presentation/widgets/auth_field.dart';
 import 'package:blog_app/features/auth/presentation/widgets/auth_gradient_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/theme/app_pallete.dart';
@@ -36,69 +40,84 @@ class _SignInPageState extends State<SignInPage> {
         child: Container(
           height: MediaQuery.of(context).size.height,
           padding: EdgeInsets.all(15.0.w),
-          child: Form(
-            key: formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Sign In',
-                  style:
-                      TextStyle(fontSize: 50.sp, fontWeight: FontWeight.bold),
+          child: BlocConsumer<AuthBloc, AuthState>(
+            listener: (context, state) {
+              if (state is AuthFailure) {
+                showSnackBar(context, state.message);
+              }
+            },
+            builder: (context, state) {
+              if (state is AuthLoading) {
+                return const Loader();
+              }
+              return Form(
+                key: formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Sign In',
+                      style: TextStyle(
+                          fontSize: 50.sp, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(
+                      height: 30.h,
+                    ),
+                    AuthField(
+                      hintText: "Email",
+                      validator: AuthValidators.emailValidator,
+                      controller: emailController,
+                    ),
+                    SizedBox(
+                      height: 15.h,
+                    ),
+                    AuthField(
+                      validator: AuthValidators.passwordValidator,
+                      hintText: "Password",
+                      controller: passwordController,
+                      isPassword: true,
+                    ),
+                    SizedBox(
+                      height: 20.h,
+                    ),
+                    AuthGradientButton(
+                      buttonText: "Sign In",
+                      onPressed: () {
+                        if (formKey.currentState!.validate()) {
+                          context.read<AuthBloc>().add(AuthSignIn(
+                                email: emailController.text.trim(),
+                                password: passwordController.text.trim(),
+                              ));
+                        }
+                      },
+                    ),
+                    SizedBox(
+                      height: 20.h,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(context, SignUpPage.route());
+                      },
+                      child: RichText(
+                          text: TextSpan(
+                              text: "Don't have an account? ",
+                              children: [
+                                TextSpan(
+                                  text: "Sign Up",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(
+                                          color: AppPallete.gradient2,
+                                          fontWeight: FontWeight.bold),
+                                )
+                              ],
+                              style: Theme.of(context).textTheme.titleMedium)),
+                    )
+                  ],
                 ),
-                SizedBox(
-                  height: 30.h,
-                ),
-                AuthField(
-                  hintText: "Email",
-                  validator: AuthValidators.emailValidator,
-                  controller: emailController,
-                ),
-                SizedBox(
-                  height: 15.h,
-                ),
-                AuthField(
-                  validator: AuthValidators.passwordValidator,
-                  hintText: "Password",
-                  controller: passwordController,
-                  isPassword: true,
-                ),
-                SizedBox(
-                  height: 20.h,
-                ),
-                AuthGradientButton(
-                  buttonText: "Sign In",
-                  onPressed: () {
-                    if (formKey.currentState!.validate()) {
-                      //todo: execute the press function
-                    }
-                  },
-                ),
-                SizedBox(
-                  height: 20.h,
-                ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(context, SignUpPage.route());
-                  },
-                  child: RichText(
-                      text: TextSpan(
-                          text: "Don't have an account? ",
-                          children: [
-                            TextSpan(
-                              text: "Sign Up",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.copyWith(
-                                      color: AppPallete.gradient2,
-                                      fontWeight: FontWeight.bold),
-                            )
-                          ],
-                          style: Theme.of(context).textTheme.titleMedium)),
-                )
-              ],
-            ),
+              );
+            },
           ),
         ),
       ),
